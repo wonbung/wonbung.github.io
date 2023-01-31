@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang='ko'>
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scaleable=no">
+    <link rel="stylesheet" href="./style.css" />
+    <title>nahida_seggs</title>
+  </head>
+  <body>
+    <div id="container" align="center">
+      <img src='./nong.jpg'>
+      <h1>가챠 URL 추출기</h1>
+      <input type='file' id='dumpstate' onchange='fileChange(this)' accept='text/plain' class='file-input__input' />
+      <label class='file-input__label' for='dumpstate'><span>파일 업로드하기</span></label>
+      <p>상태: <span id='status'>파일이 선택되지 않았습니다.</span></p>
+    </div>
+  </body>
+  <script>
+    function fileChange(form) {
+      const fileWrapper = document.querySelector('input#dumpstate');
+      const label = document.querySelector('label[for="dumpstate"]');
+      const status = document.querySelector('span#status');
+
+      const reader = new FileReader();
+      reader.addEventListener('load', (e) => {
+        label.classList.toggle('upload-disabled');
+        fileWrapper.disabled = false;
+        status.innerText = 'URL을 추출하는 중입니다..';
+        const body = e.target.result;
+
+        const hostNameRegex = /https:\/\/webstatic(-sea)?\.hoyoverse\.com/;
+        const endTrailRegex = /#\/log\n/;
+
+        const log = body.search(hostNameRegex);
+        const end = body.search(endTrailRegex) + '#/log'.length;
+        if (log === -1) {
+          status.innerText = '오류 - URL을 추출할 수 없습니다. 가이드대로 정확히 따라하셨나요?';
+          return false;
+        }
+        const url = body.slice(log, end);
+        status.innerText = 'URL을 찾았습니다.';
+        prompt('찾은 URL입니다. 선택해서 복사 후 사용하세요.', url);
+        window.location.reload();
+      });
+
+      reader.addEventListener('progress', (e) => {
+        if (e.loaded && e.total) {
+          const percent = (e.loaded / e.total) * 100;
+          status.innerText = `파일 불러오는 중 - ${Math.round(percent)}%`;
+        }
+      });
+      label.classList.toggle('upload-disabled');
+      fileWrapper.disabled = true;
+      reader.readAsText(form.files[0]);
+    }
+  </script>
+</html>
