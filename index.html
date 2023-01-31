@@ -30,10 +30,10 @@
         const body = e.target.result;
 
         const hostNameRegex = /https:\/\/webstatic(-sea)?\.hoyoverse\.com/;
-        const endTrailRegex = /#\/log\n/;
+        const endTrailRegex = /hk4e_global#\/log\n/;
 
         const log = body.search(hostNameRegex);
-        const end = body.search(endTrailRegex) + '#/log'.length;
+        const end = body.search(endTrailRegex) + 'hk4e_global#/log'.length;
         if (log === -1) {
           status.innerText = '오류 - URL을 추출할 수 없습니다. 가이드대로 정확히 따라하셨나요?';
           return false;
